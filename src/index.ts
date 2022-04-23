@@ -1,12 +1,10 @@
+import Overworld from "./Overworld";
 import "./styles.css";
-import { getGreeting } from "./greeting";
 
-class Greeter {
-  greeting: string;
-  constructor(message: string) {
-    this.greeting = message;
-  }
-  greet(): string {
-    return getGreeting();
-  }
-}
+const init = () => {
+  const overworld = new Overworld({
+    element: document.querySelector(".game-container") as Element,
+  });
+  overworld.init();
+};
+init();

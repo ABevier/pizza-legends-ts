@@ -1,4 +1,4 @@
-import GameObject from "./GameObject";
+import DirectionInput from "./DirectionInput";
 import OverworldMap from "./OverworldMap";
 
 interface OverworldConfig {
@@ -10,6 +10,7 @@ class Overworld {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
 
+  directionInput!: DirectionInput;
   map!: OverworldMap;
 
   constructor(config: OverworldConfig) {
@@ -20,7 +21,9 @@ class Overworld {
   }
 
   init() {
-    this.map = new OverworldMap(window.OverworldMaps.Kitchen);
+    this.map = new OverworldMap(window.OverworldMaps.DemoRoom);
+    this.directionInput = new DirectionInput();
+    this.directionInput.init();
     this.startGameLoop();
   }
 
@@ -31,6 +34,9 @@ class Overworld {
       this.map.drawLowerImage(this.ctx);
 
       Object.values(this.map.gameObjects).forEach((object) => {
+        object.update({
+          arrow: this.directionInput.direction,
+        });
         object.sprite.draw(this.ctx);
       });
 

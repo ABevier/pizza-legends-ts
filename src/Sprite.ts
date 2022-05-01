@@ -6,15 +6,22 @@ interface SpriteConfig {
   src: string;
   currentAnimation?: string;
   animations?: Record<string, SpriteAnimation>;
+  animationFrameLimit?: number;
   gameObject: GameObject;
 }
 
 class Sprite {
   image: HTMLImageElement;
   shadow: HTMLImageElement;
+
+  animations: Record<string, SpriteAnimation>;
+
   currentAnimation: string;
   currentAnimationFrame: number;
-  animations: Record<string, SpriteAnimation>;
+
+  animationFrameLimit: number;
+  animationFrameProgress: number;
+
   gameObject: GameObject;
 
   useShadow: boolean;
@@ -41,14 +48,71 @@ class Sprite {
 
     //Configure Animation and Intial State
     this.animations = config.animations || {
-      idleDown: [[0, 0]],
+      "idle-down": [[0, 0]],
+      "idle-right": [[0, 1]],
+      "idle-up": [[0, 2]],
+      "idle-left": [[0, 3]],
+      "walk-down": [
+        [1, 0],
+        [0, 0],
+        [3, 0],
+        [0, 0],
+      ],
+      "walk-right": [
+        [1, 1],
+        [0, 1],
+        [3, 1],
+        [0, 1],
+      ],
+      "walk-up": [
+        [1, 2],
+        [0, 2],
+        [3, 2],
+        [0, 2],
+      ],
+      "walk-left": [
+        [1, 3],
+        [0, 3],
+        [3, 3],
+        [0, 3],
+      ],
     };
 
-    this.currentAnimation = config.currentAnimation || "idleDown";
+    this.currentAnimation = config.currentAnimation || "idle-down";
+    this.currentAnimation = "walk-left";
     this.currentAnimationFrame = 0;
+
+    this.animationFrameLimit = config.animationFrameLimit || 8;
+    this.animationFrameProgress = 0;
 
     //Reference the game object
     this.gameObject = config.gameObject;
+  }
+
+  get frame() {
+    return this.animations[this.currentAnimation][this.currentAnimationFrame];
+  }
+
+  setAnimation(key: string) {
+    if (this.currentAnimation !== key) {
+      this.currentAnimation = key;
+      this.currentAnimationFrame = 0;
+      this.animationFrameProgress = this.animationFrameLimit;
+    }
+  }
+
+  updateAnimationProgress() {
+    if (this.animationFrameProgress > 0) {
+      this.animationFrameProgress--;
+      return;
+    }
+
+    this.animationFrameProgress = this.animationFrameLimit;
+    this.currentAnimationFrame++;
+    // reset if we increment too high, could also use %
+    if (!this.frame) {
+      this.currentAnimationFrame = 0;
+    }
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -58,11 +122,13 @@ class Sprite {
 
     this.isShadowLoaded && ctx.drawImage(this.shadow, x, y);
 
+    const [frameX, frameY] = this.frame;
+
     this.isLoaded &&
       ctx.drawImage(
         this.image,
-        0, // left cut
-        0, // top cut
+        frameX * 32, // left cut
+        frameY * 32, // top cut
         32, // width of cut
         32, // height of cut
         x, // x position with "nudge"
@@ -70,6 +136,8 @@ class Sprite {
         32, // sizeX
         32 // sizeY
       );
+
+    this.updateAnimationProgress();
   }
 }
 

@@ -1,4 +1,5 @@
 import GameObject from "./GameObject";
+import utils from "./utils";
 
 type SpriteAnimation = number[][];
 
@@ -79,7 +80,6 @@ class Sprite {
     };
 
     this.currentAnimation = config.currentAnimation || "idle-down";
-    this.currentAnimation = "walk-left";
     this.currentAnimationFrame = 0;
 
     this.animationFrameLimit = config.animationFrameLimit || 8;
@@ -115,10 +115,12 @@ class Sprite {
     }
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    // calculate the nudge on x and y
-    const x = this.gameObject.x - 8;
-    const y = this.gameObject.y - 18;
+  draw(ctx: CanvasRenderingContext2D, cameraPerson: GameObject) {
+    const xNudge = 8;
+    const yNudge = 18;
+    // calculate the nudge on x and y and then adjust for game object the camera is centered on
+    const x = this.gameObject.x - xNudge + (utils.withGrid(10.5) - cameraPerson.x);
+    const y = this.gameObject.y - yNudge + (utils.withGrid(6) - cameraPerson.y);
 
     this.isShadowLoaded && ctx.drawImage(this.shadow, x, y);
 

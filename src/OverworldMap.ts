@@ -23,12 +23,16 @@ class OverworldMap {
     this.upperImage.src = config.upperSrc;
   }
 
-  drawLowerImage(ctx: CanvasRenderingContext2D) {
-    ctx.drawImage(this.lowerImage, 0, 0);
+  drawLowerImage(ctx: CanvasRenderingContext2D, cameraPerson: GameObject) {
+    const x = utils.withGrid(10.5) - cameraPerson.x;
+    const y = utils.withGrid(6) - cameraPerson.y;
+    ctx.drawImage(this.lowerImage, x, y);
   }
 
-  drawUpperImage(ctx: CanvasRenderingContext2D) {
-    ctx.drawImage(this.upperImage, 0, 0);
+  drawUpperImage(ctx: CanvasRenderingContext2D, cameraPerson: GameObject) {
+    const x = utils.withGrid(10.5) - cameraPerson.x;
+    const y = utils.withGrid(6) - cameraPerson.y;
+    ctx.drawImage(this.upperImage, x, y);
   }
 }
 
